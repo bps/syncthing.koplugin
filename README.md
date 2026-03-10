@@ -11,30 +11,43 @@ A [KOReader](https://koreader.rocks/) plugin that runs [Syncthing](https://synct
 - Automatically enables Wi-Fi if needed
 - Opens firewall on Kindle (`iptables`); no-op on Kobo where it isn't needed
 
-## Setup
+## Installation
 
-1. Copy the `syncthing.koplugin` directory into your KOReader `plugins/` folder:
-   - **Kobo:** `/mnt/onboard/.adds/koreader/plugins/syncthing.koplugin/`
-   - **Kindle:** `/mnt/us/koreader/plugins/syncthing.koplugin/`
-2. Restart KOReader.
-3. Open the menu: **☰ → Tools → Syncthing → Download binary**.
-4. Once downloaded: **☰ → Tools → Syncthing → Start Syncthing**.
-5. Open the Syncthing Web UI in a browser on another device (the URL is shown in *Connection info*).
+### Via Updates Manager (recommended)
 
-### Manual binary install
+If you already have the [Updates Manager](https://github.com/advokatb/updatesmanager.koplugin) plugin installed, add this to your `KOReader/settings/updatesmanager_config.json`:
 
-If auto-download doesn't work (no `wget`/`curl` with HTTPS, rate-limited, etc.), download the binary yourself:
+```json
+{
+  "plugins": [
+    {
+      "owner": "bps",
+      "repo": "syncthing.koplugin",
+      "description": "Syncthing plugin"
+    }
+  ]
+}
+```
 
-1. Go to [syncthing.net/downloads](https://syncthing.net/downloads/).
-2. Download the **Linux ARM** (32-bit) or **Linux ARM64** build matching your device.
-3. Extract and copy the `syncthing` binary to `syncthing.koplugin/bin/syncthing`.
-4. Ensure it's executable (`chmod +x`).
+Then check for updates in **☰ → Tools → Updates Manager → Plugins → Check for Updates**.
+
+### Manual
+
+1. Download the latest release ZIP from [Releases](https://github.com/bps/syncthing.koplugin/releases).
+2. Extract the `syncthing.koplugin` folder into your KOReader `plugins/` directory:
+   - **Kobo:** `/mnt/onboard/.adds/koreader/plugins/`
+   - **Kindle:** `/mnt/us/koreader/plugins/`
+3. Restart KOReader.
+4. Open the menu: **☰ → Tools → Syncthing → Download binary**.
+5. Once downloaded: **☰ → Tools → Syncthing → Start Syncthing**.
+6. Open the Syncthing Web UI in a browser on another device (the URL is shown in *Connection info*).
 
 ## Directory layout
 
 ```
 syncthing.koplugin/
 ├── main.lua          # plugin entry point
+├── _meta.lua         # version metadata (used by Updates Manager)
 ├── cacert.pem        # Mozilla CA bundle (for Kobo, which lacks a system CA store)
 ├── bin/
 │   └── syncthing     # binary (auto-downloaded or user-provided, not checked in)
@@ -46,6 +59,7 @@ Syncthing's config, keys, and index database are stored under KOReader's setting
 
 ## Notes
 
+- The Syncthing binary is *not* included — the plugin downloads it on first use (**☰ → Tools → Syncthing → Download binary**). If auto-download fails (no HTTPS support, rate-limited, etc.), you can [install it manually](https://syncthing.net/downloads/): download the Linux ARM or ARM64 build, extract the `syncthing` binary to `syncthing.koplugin/bin/syncthing`, and `chmod +x` it.
 - Syncthing's `--home` is set to `settings/syncthing/` under KOReader's data directory. It stores `config.xml`, TLS keys, and the index database. Back it up if you want to preserve your device ID and folder configs.
 - The Web UI listens on `0.0.0.0:8384` (all interfaces). The first time you open it, Syncthing will prompt you to set a password. *Do that* — anyone on your network can reach the UI otherwise.
 - Syncthing can use significant CPU and battery. Stop it when you're done syncing.
